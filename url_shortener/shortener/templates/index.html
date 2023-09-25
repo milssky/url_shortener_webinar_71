@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load addcss %}
+{% block title %}Главная страница{% endblock %}
+
+{% block content %}
+  {% if user.is_authenticated %}
+  <h2>Добро пожаловать!</h2>
+  <ul>
+  {% for field, errors in form.errors.items %}
+    {% for error in errors %}
+    <li>{{error}}</li>
+    {% endfor %}
+  {% endfor %}
+  </ul>
+  <form method='post' action='{% url 'create_url' %}'>
+    {% csrf_token %}
+    {% for field in form %}
+      {{ field|addcss:"form-control" }}
+      <small>{{ field.label }}</small>
+    {% endfor %}
+    <div class='my-3'><input class="btn btn-primary" type="submit" value="Отправить"></div>
+  </form>
+  <h2>Ваши ссылки:</h2>
+  <ol class='list-group list-group-numbered'>
+  {% for url_obj in user_urls %}
+  <li class='list-group-item d-flex justify-content-left align-items-start'>
+    <div class="ms-2 me-auto">
+      <div class="fw-bold"><a href='{% url 'goto' url_obj.shorted_url %}'>Сокращенная ссылка: {{ url_obj.shorted_url }}</a></div>
+      Посещений: {{ url_obj.visited_times }}.
+      <span class="badge bg-danger rounded-pill"><a href='{% url 'delete_url' url_obj.shorted_url %}'>Удалить ссылку</a></span>
+    </div>
+  </li>
+  {% endfor %}  
+  </ol>
+  {% else %}
+    <h2>Добро пожаловать! Войдите, чтобы продолжить.</h2>
+  {% endif %} 
+{% endblock %}
